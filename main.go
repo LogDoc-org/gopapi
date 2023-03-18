@@ -108,8 +108,8 @@ func (e *LogEntry) SetField(nameRaw string, value string) {
 }
 
 type ConnectionType struct {
-	tcp  bool   // true - tcp, false - udp
-	name string // unique name of the type
+	Tcp  bool   // true - tcp, false - udp
+	Name string // unique name of the type
 }
 
 type SinkPlugin interface {
