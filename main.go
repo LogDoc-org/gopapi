@@ -1,6 +1,7 @@
 package gopapi
 
 import (
+	"github.com/gurkankaymak/hocon"
 	"strconv"
 	"strings"
 )
@@ -113,10 +114,8 @@ type ConnectionType struct {
 }
 
 type SinkPlugin interface {
-	ConfigSectionName() string
-	Configure(interface{})
-	SetEntryConsumer(func(entry LogEntry))
+	Configure(config hocon.Config, consumer func(entry LogEntry))
 	SupportedTypes() []ConnectionType
 
-	Chunk(chunk []byte, source string) []byte
+	Chunk(chunk []byte, source string, tcp bool) []byte
 }
