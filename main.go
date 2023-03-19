@@ -2,6 +2,7 @@ package gopapi
 
 import (
 	"github.com/gurkankaymak/hocon"
+	"plugin"
 	"strconv"
 	"strings"
 )
@@ -113,9 +114,52 @@ type ConnectionType struct {
 	Name string // unique name of the type
 }
 
-type SinkPlugin interface {
-	Configure(config hocon.Config, consumer func(entry LogEntry))
-	SupportedTypes() []ConnectionType
+type SinkPlugin struct {
+	configure      func(config hocon.Config, consumer func(entry LogEntry))
+	supportedTypes func() []ConnectionType
 
-	Chunk(chunk []byte, source string, tcp bool) []byte
+	chunk func(chunk []byte, source string, tcp bool) []byte
+}
+
+func (plug *SinkPlugin) Configure(config hocon.Config, consumer func(entry LogEntry)) {
+	plug.configure(config, consumer)
+}
+
+func (plug *SinkPlugin) SupportedTypes() []ConnectionType {
+	return plug.supportedTypes()
+}
+
+func (plug *SinkPlugin) Chunk(chunk []byte, source string, tcp bool) []byte {
+	return plug.chunk(chunk, source, tcp)
+}
+
+func (plug *SinkPlugin) Init(lookup func(symName string) (plugin.Symbol, error)) error {
+	cfgSym, err := lookup("Configure")
+	if err != nil {
+		return err
+	}
+
+	typesSym, err := lookup("SupportedTypes")
+	if err != nil {
+		return err
+	}
+
+	chunkSym, err := lookup("Chunk")
+	if err != nil {
+		return err
+	}
+
+	plug.configure = func(config hocon.Config, consumer func(entry LogEntry)) {
+		cfgSym.(func(config hocon.Config, consumer func(entry LogEntry)))(config, consumer)
+	}
+
+	plug.supportedTypes = func() []ConnectionType {
+		return typesSym.(func() []ConnectionType)()
+	}
+
+	plug.chunk = func(chunk []byte, source string, tcp bool) []byte {
+		return chunkSym.(func(chunk []byte, source string, tcp bool) []byte)(chunk, source, tcp)
+	}
+
+	return nil
 }
