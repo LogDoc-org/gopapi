@@ -115,13 +115,13 @@ type ConnectionType struct {
 }
 
 type SinkPlugin struct {
-	configure      func(config hocon.Config, consumer func(entry LogEntry))
+	configure      func(config *hocon.Config, consumer func(entry LogEntry))
 	supportedTypes func() []ConnectionType
 
 	chunk func(chunk []byte, source string, tcp bool) []byte
 }
 
-func (plug *SinkPlugin) Configure(config hocon.Config, consumer func(entry LogEntry)) {
+func (plug *SinkPlugin) Configure(config *hocon.Config, consumer func(entry LogEntry)) {
 	plug.configure(config, consumer)
 }
 
@@ -149,8 +149,8 @@ func (plug *SinkPlugin) Init(lookup func(symName string) (plugin.Symbol, error))
 		return err
 	}
 
-	plug.configure = func(config hocon.Config, consumer func(entry LogEntry)) {
-		cfgSym.(func(config hocon.Config, consumer func(entry LogEntry)))(config, consumer)
+	plug.configure = func(config *hocon.Config, consumer func(entry LogEntry)) {
+		cfgSym.(func(config *hocon.Config, consumer func(entry LogEntry)))(config, consumer)
 	}
 
 	plug.supportedTypes = func() []ConnectionType {
