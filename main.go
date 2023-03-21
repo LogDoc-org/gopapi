@@ -41,6 +41,10 @@ type LogEntry struct {
 	fields map[string]string
 }
 
+func NewEntry() LogEntry {
+	return LogEntry{fields: make(map[string]string, 0)}
+}
+
 func (e *LogEntry) GetField(name string) string {
 	return e.fields[name]
 }
