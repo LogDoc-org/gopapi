@@ -45,6 +45,17 @@ func NewEntry() LogEntry {
 	return LogEntry{fields: make(map[string]string, 0)}
 }
 
+func (e *LogEntry) FieldsNames() []string {
+	keys := make([]string, len(e.fields))
+	i := 0
+	for k := range e.fields {
+		keys[i] = k
+		i++
+	}
+
+	return keys
+}
+
 func (e *LogEntry) GetField(name string) string {
 	return e.fields[name]
 }
