@@ -45,6 +45,25 @@ type LogEntry struct {
 	fields map[string]string
 }
 
+func (e *LogEntry) LevelName() string {
+	switch e.Level {
+	case DEBUG:
+		return `DEBUG`
+	case INFO:
+		return `INFO`
+	case LOG:
+		return `LOG`
+	case WARN:
+		return `WARN`
+	case ERROR:
+		return `ERROR`
+	case SEVERE:
+		return `SEVERE`
+	default:
+		return `PANIC`
+	}
+}
+
 func NewEntry() LogEntry {
 	return LogEntry{fields: make(map[string]string, 0)}
 }
