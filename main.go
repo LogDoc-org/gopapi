@@ -2,7 +2,9 @@ package gopapi
 
 import (
 	"github.com/gurkankaymak/hocon"
+	"log"
 	"plugin"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -27,6 +29,8 @@ const ( // log levels
 	SEVERE
 	PANIC
 )
+
+var fre = regexp.MustCompile(`^[a-zA-Z]\w+$`)
 
 type LogEntry struct {
 	Ip      string
@@ -120,6 +124,10 @@ func (e *LogEntry) SetField(nameRaw string, value string) {
 			break
 		}
 	default:
+		if !fre.MatchString(name) {
+			log.Printf("Field name doesnt match convention: '%s'", name)
+			return
+		}
 		e.fields[name] = value
 	}
 }
